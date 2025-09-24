@@ -19,7 +19,7 @@ jobs:
         uses: SonarSource/sonarqube-scan-action@v2
         env:
           SONAR_TOKEN: ${{ secrets.TOKEN }}
-          SONAR_HOST_URL: http://172.17.0.1:9000
+          SONAR_HOST_URL: http://192.168.1.28:9000
         with:
           projectBaseDir: .
 
