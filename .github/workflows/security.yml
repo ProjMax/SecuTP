@@ -1,0 +1,49 @@
+name: CI/CD Sécurisé
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  # Job de scan SonarQube
+  sonar_scan:
+    runs-on: self-hosted
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+      - name: Set up SonarQube scanner
+        uses: SonarSource/sonarcloud-github-action@master
+        with:
+          sonar-token: ${{ secrets.TOKEN }}
+      - name: Run SonarQube scan
+        run: sonar-scanner
+
+  # Job de scan Trivy pour les conteneurs Docker
+  trivy_scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install Trivy
+        run: curl -sSL https://github.com/aquasecurity/trivy/releases/download/v0.34.0/trivy_0.34.0_Linux-64bit.deb -o trivy.deb && sudo dpkg -i trivy.deb
+      - name: Scan Docker image
+        run: trivy image mydockerimage:latest
+
+  # Job de scan de vulnérabilités dans les dépendances avec Snyk
+  snyk_scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+      - name: Install dependencies
+        run: npm install
+      - name: Scan with Snyk
+        uses: snyk/actions/node@v2
+        with:
+          snyk-token: ${{ secrets.SNYK_TOKEN }}
