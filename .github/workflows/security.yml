@@ -9,18 +9,18 @@ on:
       - main
 
 jobs:
-  # Job de scan SonarQube
   sonar_scan:
     runs-on: self-hosted
     steps:
       - name: Check out code
         uses: actions/checkout@v2
-      - name: Set up SonarQube scanner
-        uses: SonarSource/sonarcloud-github-action@master
-        with:
-          sonar-token: ${{ secrets.TOKEN }}
+
       - name: Run SonarQube scan
-        run: sonar-scanner
+        uses: SonarSource/sonarqube-scan-action@v2
+        env:
+          SONAR_TOKEN: ${{ secrets.TOKEN }}
+        with:
+          projectBaseDir: .
 
   # Job de scan Trivy pour les conteneurs Docker
   trivy_scan:
